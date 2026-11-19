@@ -1,0 +1,2970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#bfe5f2">
+<title>Paopao & Luke | Love Adventure ♡</title>
+
+<style>
+:root {
+  --sky:#bfe5f2;
+  --grass:#689d4b;
+  --dirt:#946d6d;
+  --pink:#e99ab7;
+  --cream:#fff6dd;
+  --ink:#674e64;
+  --blue:#b0cde6;
+  --purple:#a290b7;
+  --gold:#f3ce77;
+}
+
+* {
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,body {
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:var(--sky);
+  color:var(--ink);
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  touch-action:none;
+  overscroll-behavior:none;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
+}
+
+button {
+  font:inherit;
+  cursor:pointer;
+  touch-action:none;
+  -webkit-touch-callout:none;
+}
+
+#game {
+  position:fixed;
+  inset:0;
+  overflow:hidden;
+}
+
+canvas {
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  display:block;
+}
+
+.panel {
+  background:rgba(255,246,221,.96);
+  border:3px solid var(--dirt);
+  border-radius:18px;
+  box-shadow:0 5px 0 rgba(103,78,100,.16);
+}
+
+#hud {
+  position:absolute;
+  z-index:5;
+  top:calc(12px + env(safe-area-inset-top));
+  left:calc(12px + env(safe-area-inset-left));
+  right:calc(12px + env(safe-area-inset-right));
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  pointer-events:none;
+}
+
+.hudgroup {
+  display:flex;
+  gap:8px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+.hudbox {
+  padding:8px 13px;
+  font-size:13px;
+  font-weight:900;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+#loveCount {
+  color:#d67e9e;
+  font-size:16px;
+}
+
+#zoneBadge {
+  background:rgba(255,246,221,.94);
+  color:var(--ink);
+  transition:all .4s ease;
+}
+
+#dashIndicator {
+  padding:6px 11px;
+  font-size:11px;
+  font-weight:900;
+  border-radius:14px;
+  border:2px solid var(--dirt);
+  background:rgba(255,246,221,.92);
+  display:flex;
+  align-items:center;
+  gap:5px;
+}
+
+#dashBarWrap {
+  width:42px;
+  height:7px;
+  background:#e7d8c9;
+  border-radius:99px;
+  overflow:hidden;
+  border:1px solid var(--dirt);
+}
+
+#dashBar {
+  height:100%;
+  width:100%;
+  background:linear-gradient(90deg,var(--pink),var(--gold));
+  transition:width .08s linear;
+}
+
+#hudButtons {
+  display:flex;
+  gap:7px;
+  pointer-events:auto;
+}
+
+.iconbtn {
+  min-width:42px;
+  height:42px;
+  padding:0 9px;
+  border:3px solid var(--dirt);
+  border-radius:13px;
+  background:var(--cream);
+  font-size:17px;
+  font-weight:900;
+  color:var(--ink);
+  box-shadow:0 4px 0 rgba(103,78,100,.14);
+  transition:transform .08s;
+}
+
+.iconbtn:active {
+  transform:translateY(2px);
+}
+
+#progressWrap {
+  position:absolute;
+  z-index:5;
+  top:calc(66px + env(safe-area-inset-top));
+  left:50%;
+  transform:translateX(-50%);
+  width:min(420px,46vw);
+  height:12px;
+  border:2px solid var(--dirt);
+  border-radius:99px;
+  background:var(--cream);
+  overflow:visible;
+  box-shadow:0 3px 0 rgba(103,78,100,.12);
+}
+
+#progress {
+  height:100%;
+  width:0;
+  border-radius:99px;
+  background:linear-gradient(90deg,var(--pink),var(--gold));
+  transition:width .12s;
+}
+
+#progressHeart {
+  position:absolute;
+  top:50%;
+  left:0%;
+  transform:translate(-50%,-50%);
+  font-size:14px;
+  color:#d67e9e;
+  text-shadow:0 1px 0 var(--cream);
+  pointer-events:none;
+}
+
+#objective {
+  position:absolute;
+  z-index:5;
+  top:calc(84px + env(safe-area-inset-top));
+  left:50%;
+  transform:translateX(-50%);
+  font-size:11px;
+  font-weight:900;
+  white-space:nowrap;
+  background:rgba(255,246,221,.82);
+  padding:3px 10px;
+  border-radius:99px;
+  border:1.5px solid rgba(148,109,109,.45);
+}
+
+#questPanel {
+  position:absolute;
+  z-index:6;
+  top:calc(114px + env(safe-area-inset-top));
+  left:calc(14px + env(safe-area-inset-left));
+  width:215px;
+  padding:10px 12px;
+  background:rgba(255,246,221,.94);
+  border:2.5px solid var(--dirt);
+  border-radius:15px;
+  box-shadow:0 4px 0 rgba(103,78,100,.12);
+  font-size:11px;
+  line-height:1.85;
+  font-weight:850;
+  pointer-events:none;
+}
+
+#questPanel strong {
+  display:block;
+  color:#d67e9e;
+  font-size:12px;
+  margin-bottom:2px;
+}
+
+.questrow {
+  display:flex;
+  justify-content:space-between;
+}
+
+.questrow span:last-child {
+  color:#d67e9e;
+  font-weight:900;
+}
+
+#checkpointTag {
+  position:absolute;
+  z-index:5;
+  right:calc(14px + env(safe-area-inset-right));
+  top:calc(114px + env(safe-area-inset-top));
+  background:rgba(255,246,221,.94);
+  border:2.5px solid var(--dirt);
+  border-radius:12px;
+  padding:7px 11px;
+  font-size:10px;
+  font-weight:900;
+  box-shadow:0 4px 0 rgba(103,78,100,.12);
+}
+
+#toast {
+  position:absolute;
+  z-index:30;
+  left:50%;
+  bottom:22%;
+  transform:translate(-50%,12px);
+  opacity:0;
+  padding:10px 18px;
+  background:var(--cream);
+  border:3px solid var(--dirt);
+  border-radius:15px;
+  font-weight:900;
+  font-size:13px;
+  text-align:center;
+  transition:.22s cubic-bezier(.2,.9,.3,1.2);
+  pointer-events:none;
+  max-width:90vw;
+  box-shadow:0 6px 0 rgba(103,78,100,.16);
+}
+
+#toast.show {
+  opacity:1;
+  transform:translate(-50%,0);
+}
+
+/* OVERLAYS & MENUS */
+
+.overlay {
+  position:absolute;
+  z-index:20;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(67,52,65,.44);
+  backdrop-filter:blur(5px);
+  -webkit-backdrop-filter:blur(5px);
+}
+
+.overlay.show {
+  display:flex;
+  animation:fadeIn .22s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity:0; }
+  to { opacity:1; }
+}
+
+.menuCard {
+  width:min(580px,94vw);
+  padding:34px;
+  text-align:center;
+}
+
+.logoheart {
+  font-size:60px;
+  color:var(--pink);
+  text-shadow:3px 4px 0 var(--dirt);
+  animation:float 2s ease-in-out infinite;
+}
+
+.menuCard h1 {
+  font-size:clamp(30px,5vw,50px);
+  color:#d67e9e;
+  margin:10px 0;
+}
+
+.subtitle {
+  font-weight:800;
+  opacity:.82;
+  line-height:1.6;
+}
+
+.instructions {
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:8px;
+  margin:20px 0;
+}
+
+.pill {
+  padding:8px 12px;
+  border-radius:99px;
+  background:#f9e4e7;
+  border:2px solid #e9b0c3;
+  font-size:11px;
+  font-weight:900;
+}
+
+.mainbtn {
+  border:3px solid var(--dirt);
+  border-radius:15px;
+  background:var(--pink);
+  color:white;
+  padding:14px 25px;
+  font-weight:1000;
+  box-shadow:0 6px 0 rgba(103,78,100,.2);
+  min-height:50px;
+}
+
+.secondary {
+  background:var(--cream);
+  color:var(--ink);
+  margin-left:7px;
+}
+
+.smallnote {
+  font-size:10px;
+  margin-top:18px;
+  opacity:.7;
+  font-weight:800;
+}
+
+/* POLAROID MEMORY CARD */
+
+.polaroidCard {
+  width:min(430px,92vw);
+  background:#fffdf7;
+  border:4px solid var(--dirt);
+  border-radius:20px;
+  padding:18px 18px 22px;
+  box-shadow:0 18px 45px rgba(50,38,50,.32);
+  text-align:center;
+  transform:rotate(-1deg);
+}
+
+.polaroidBadge {
+  display:inline-block;
+  font-size:10.5px;
+  font-weight:900;
+  color:#9e2a5b;
+  background:#fceaf0;
+  border:1.5px solid #e9b0c3;
+  border-radius:99px;
+  padding:4px 12px;
+  margin-bottom:10px;
+}
+
+#polaroidCanvas {
+  position:static;
+  width:100%;
+  height:185px;
+  border-radius:12px;
+  border:2.5px solid var(--dirt);
+  background:#bfe5f2;
+  margin-bottom:12px;
+}
+
+.polaroidCard h3 {
+  margin:4px 0 6px;
+  font-size:19px;
+  color:#9e2a5b;
+}
+
+.polaroidCard p {
+  margin:0 0 14px;
+  font-size:14.5px;
+  line-height:1.58;
+  color:#2e1f2b;
+  font-weight:600;
+}
+
+/* NOVEMBER 20, 2026 LETTER - HIGH-CONTRAST & CRYSTAL CLEAR READABILITY */
+
+#message {
+  z-index: 35;
+  background: rgba(34, 24, 33, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 18px;
+}
+
+.letter {
+  width: min(740px, 94vw);
+  max-height: 88vh;
+  overflow-y: auto;
+  background: #FFFDF7;
+  color: #2E1F2B;
+  border: 5px solid #D66A94;
+  border-radius: 28px;
+  padding: 36px 42px 34px;
+  text-align: center;
+  box-shadow: 0 26px 70px rgba(20, 12, 20, 0.48);
+  -webkit-overflow-scrolling: touch;
+}
+
+.bigheart {
+  font-size: 56px;
+  color: #D66A94;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.letter h1 {
+  margin: 6px 0 6px;
+  font-size: clamp(26px, 4.4vw, 42px);
+  line-height: 1.2;
+  color: #9E2A5B;
+  font-weight: 900;
+  letter-spacing: -0.3px;
+}
+
+.letter h2 {
+  font-size: clamp(14px, 2vw, 17px);
+  margin: 0 0 14px;
+  color: #6B4C62;
+  font-weight: 800;
+}
+
+.counterPill {
+  display: inline-block;
+  background: #FCEAF0;
+  border: 2px solid #E59BB7;
+  color: #9E2A5B;
+  font-size: 13px;
+  font-weight: 900;
+  padding: 7px 16px;
+  border-radius: 99px;
+  margin-bottom: 20px;
+}
+
+.letterBody {
+  background: #FFF8EC;
+  border: 2px solid #EFE0C9;
+  border-radius: 20px;
+  padding: 22px 26px;
+  text-align: left;
+  margin: 0 auto 20px;
+  max-width: 620px;
+}
+
+.letter p {
+  font-size: clamp(16px, 2.1vw, 18.5px);
+  line-height: 1.78;
+  color: #2E1F2B;
+  margin: 0 0 16px;
+  font-weight: 500;
+}
+
+.letter p:last-child {
+  margin-bottom: 0;
+}
+
+.letter p strong {
+  color: #9E2A5B;
+  font-weight: 800;
+}
+
+.letterSignoff {
+  font-size: clamp(17px, 2.2vw, 20px);
+  font-weight: 900;
+  color: #9E2A5B;
+  margin: 8px 0 4px;
+}
+
+.date {
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #6B4C62;
+}
+
+.letterActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+#fireworksBtn {
+  border: 3px solid #7A5454;
+  border-radius: 14px;
+  padding: 13px 20px;
+  min-height: 48px;
+  background: #F3CE77;
+  color: #2E1F2B;
+  font-size: 14px;
+  font-weight: 900;
+  box-shadow: 0 4px 0 rgba(46, 31, 43, 0.18);
+}
+
+#close {
+  border: 3px solid #7A5454;
+  border-radius: 14px;
+  padding: 13px 22px;
+  min-height: 48px;
+  background: #D66A94;
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 900;
+  box-shadow: 0 4px 0 rgba(46, 31, 43, 0.18);
+}
+
+@keyframes float {
+  50% { transform:translateY(-8px); }
+}
+
+/* TOUCH CONTROLS (IPAD & MOBILE OPTIMIZED) */
+
+#touch {
+  position:absolute;
+  z-index:12;
+  inset:auto 0 0;
+  display:none;
+  align-items:flex-end;
+  justify-content:space-between;
+  padding:
+    12px
+    calc(22px + env(safe-area-inset-right))
+    calc(24px + env(safe-area-inset-bottom))
+    calc(22px + env(safe-area-inset-left));
+  pointer-events:none;
+}
+
+body.touch-on #touch {
+  display:flex;
+}
+
+.touchcluster {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+  pointer-events:none;
+}
+
+.touchgroup {
+  display:flex;
+  gap:14px;
+  align-items:flex-end;
+  pointer-events:none;
+}
+
+.touchpad-dpad {
+  display:flex;
+  gap:12px;
+  padding:6px;
+  border-radius:28px;
+  background:rgba(255,246,221,.34);
+  backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);
+  pointer-events:auto;
+  touch-action:none;
+}
+
+.clusterlabel {
+  font-size:10px;
+  font-weight:1000;
+  letter-spacing:1.1px;
+  color:var(--ink);
+  background:rgba(255,246,221,.82);
+  padding:2px 10px;
+  border-radius:99px;
+  border:1.5px solid rgba(148,109,109,.45);
+  pointer-events:none;
+}
+
+.touchbtn {
+  position:relative;
+  pointer-events:auto;
+  touch-action:none;
+  border:3.5px solid var(--dirt);
+  background:rgba(255,246,221,.95);
+  color:var(--ink);
+  box-shadow:0 6px 0 rgba(103,78,100,.24);
+  font-weight:1000;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  transition:transform .07s,background .07s,opacity .15s,box-shadow .15s;
+}
+
+.touchbtn small {
+  font-size:9px;
+  letter-spacing:.6px;
+  opacity:.82;
+  margin-top:2px;
+}
+
+.touchbtn:active,
+.touchbtn.pressed {
+  transform:translateY(4px) scale(.94);
+  background:#f5d8e2;
+  box-shadow:0 2px 0 rgba(103,78,100,.24);
+}
+
+#leftBtn,#rightBtn {
+  width:78px;
+  height:78px;
+  border-radius:24px;
+  font-size:30px;
+}
+
+#dashBtn {
+  width:74px;
+  height:74px;
+  border-radius:50%;
+  font-size:24px;
+  background:rgba(176,205,230,.96);
+}
+
+#dashBtn.cooling {
+  opacity:.52;
+  filter:grayscale(.35);
+}
+
+#dashBtn.ready {
+  box-shadow:0 6px 0 rgba(103,78,100,.24), 0 0 0 3px rgba(255,246,221,.75);
+}
+
+#jump {
+  width:90px;
+  height:90px;
+  border-radius:50%;
+  font-size:32px;
+  background:rgba(233,154,183,.97);
+  color:white;
+}
+
+#action {
+  width:78px;
+  height:78px;
+  border-radius:50%;
+  font-size:28px;
+  background:rgba(243,206,119,.96);
+}
+
+#action.highlight {
+  animation:pulseAction 1s ease-in-out infinite;
+  background:#ffe28a;
+  border-color:#d67e9e;
+}
+
+@keyframes pulseAction {
+  0%, 100% {
+    transform:scale(1);
+    box-shadow:0 6px 0 rgba(103,78,100,.24), 0 0 0 0 rgba(233,154,183,.7);
+  }
+  50% {
+    transform:scale(1.07);
+    box-shadow:0 6px 0 rgba(103,78,100,.24), 0 0 0 10px rgba(233,154,183,0);
+  }
+}
+
+/* TOUCH & MOBILE RESPONSIVE */
+
+@media (pointer:coarse), (hover:none), (max-width:1366px) {
+  #touch {
+    display:flex;
+  }
+
+  #questPanel {
+    top:calc(96px + env(safe-area-inset-top));
+    left:calc(12px + env(safe-area-inset-left));
+    width:192px;
+    font-size:10.5px;
+    padding:8px 10px;
+  }
+
+  #questPanel strong {
+    font-size:11px;
+  }
+
+  #checkpointTag {
+    top:calc(96px + env(safe-area-inset-top));
+    right:calc(12px + env(safe-area-inset-right));
+    font-size:10px;
+  }
+
+  #objective {
+    display:none;
+  }
+
+  #progressWrap {
+    top:calc(62px + env(safe-area-inset-top));
+    width:min(380px,44vw);
+  }
+
+  #toast {
+    bottom:calc(146px + env(safe-area-inset-bottom));
+  }
+
+  .letter {
+    padding: 24px 18px;
+    max-height: 86vh;
+  }
+
+  .letterBody {
+    padding: 16px 16px;
+  }
+
+  .menuCard {
+    padding:24px 18px;
+  }
+}
+
+@media (max-width:900px) {
+  #zoneBadge {
+    display:none;
+  }
+}
+
+@media(max-width:600px) {
+  #leftBtn,#rightBtn {
+    width:60px;
+    height:60px;
+    border-radius:18px;
+    font-size:24px;
+  }
+
+  .touchpad-dpad {
+    gap:8px;
+    padding:4px;
+  }
+
+  #dashBtn {
+    width:60px;
+    height:60px;
+    font-size:20px;
+  }
+
+  #jump {
+    width:74px;
+    height:74px;
+    font-size:27px;
+  }
+
+  #action {
+    width:64px;
+    height:64px;
+    font-size:23px;
+  }
+
+  #touch {
+    padding-left:10px;
+    padding-right:10px;
+    padding-bottom:calc(14px + env(safe-area-inset-bottom));
+  }
+
+  .touchgroup {
+    gap:8px;
+  }
+
+  #questPanel {
+    width:162px;
+    font-size:9px;
+  }
+
+  #checkpointTag {
+    max-width:128px;
+    text-align:center;
+    font-size:9px;
+  }
+
+  .hudbox {
+    padding:6px 9px;
+    font-size:11px;
+  }
+
+  #loveCount {
+    font-size:14px;
+  }
+
+  .iconbtn {
+    min-width:38px;
+    height:38px;
+    font-size:15px;
+  }
+
+  .letter p {
+    font-size: 15.5px;
+    line-height: 1.72;
+  }
+}
+</style>
+</head>
+
+<body>
+<div id="game">
+
+<canvas id="canvas"></canvas>
+
+<audio id="bgMusic" loop preload="auto">
+  <source src="music.mp3" type="audio/mpeg">
+</audio>
+
+<div id="hud">
+  <div class="hudgroup">
+    <div class="panel hudbox">
+      ♡ <span id="loveCount">0 / 12</span>
+    </div>
+    <div class="panel hudbox" id="zoneBadge">
+      ☀ MORNING MEADOW
+    </div>
+    <div id="dashIndicator" title="Love Dash Ready">
+      <span>✦ DASH</span>
+      <div id="dashBarWrap"><div id="dashBar"></div></div>
+    </div>
+  </div>
+
+  <div id="hudButtons">
+    <button class="iconbtn" id="touchToggleBtn" aria-label="Toggle touchscreen controls" title="Toggle iPad / Touch Buttons">🎮</button>
+    <button class="iconbtn" id="musicBtn" aria-label="Toggle music" title="Music">♫</button>
+    <button class="iconbtn" id="soundBtn" aria-label="Toggle sound effects" title="SFX">♪</button>
+    <button class="iconbtn" id="pauseBtn" aria-label="Pause game" title="Pause">Ⅱ</button>
+  </div>
+</div>
+
+<div id="progressWrap">
+  <div id="progress"></div>
+  <div id="progressHeart">♥</div>
+</div>
+
+<div id="objective">
+  DOUBLE JUMP · LOVE DASH · COLLECT MEMORIES · MEET LUKE AT THE HEART
+</div>
+
+<div id="questPanel">
+  <strong>✦ LITTLE SIDE QUESTS</strong>
+  <div class="questrow">
+    <span>🌸 Flower petals</span>
+    <span id="petalQuest">0 / 8</span>
+  </div>
+  <div class="questrow">
+    <span>📸 Polaroids</span>
+    <span id="memoryQuest">0 / 4</span>
+  </div>
+  <div class="questrow">
+    <span>⭐ Secret star</span>
+    <span id="starQuest">0 / 1</span>
+  </div>
+</div>
+
+<div id="checkpointTag">CHECKPOINT: START</div>
+<div id="toast"></div>
+
+<!-- TOUCH CONTROLS (IPAD / TABLET / MOBILE) -->
+
+<div id="touch" aria-label="Touchscreen Game Controls">
+  <div class="touchcluster">
+    <div class="touchpad-dpad" id="dpadZone">
+      <button class="touchbtn" id="leftBtn" type="button" aria-label="Move left">◀<small>LEFT</small></button>
+      <button class="touchbtn" id="rightBtn" type="button" aria-label="Move right">▶<small>RIGHT</small></button>
+    </div>
+    <div class="clusterlabel">MOVE</div>
+  </div>
+
+  <div class="touchcluster">
+    <div class="touchgroup">
+      <button class="touchbtn ready" id="dashBtn" type="button" aria-label="Love Dash">⚡<small>DASH</small></button>
+      <button class="touchbtn" id="jump" type="button" aria-label="Jump or Double Jump">↑<small>JUMP ×2</small></button>
+      <button class="touchbtn" id="action" type="button" aria-label="Interact or Open Letter">♡<small>OPEN</small></button>
+    </div>
+    <div class="clusterlabel">ACTIONS</div>
+  </div>
+</div>
+
+<!-- START SCREEN -->
+
+<div class="overlay show" id="startScreen">
+  <div class="menuCard panel">
+    <div class="logoheart">♥</div>
+    <h1>Paopao & Luke</h1>
+
+    <p class="subtitle">
+      A tiny adventure made with a whole lot of love.
+      Double jump across clouds, dash through sunset skies, collect Polaroid memories, and meet Luke at the giant heart!
+    </p>
+
+    <div class="instructions">
+      <span class="pill">◀ ▶ / WASD · MOVE</span>
+      <span class="pill">↑ / SPACE · DOUBLE JUMP</span>
+      <span class="pill">SHIFT / X · LOVE DASH</span>
+      <span class="pill">E / ♡ · INTERACT</span>
+    </div>
+
+    <button class="mainbtn" id="startBtn">
+      START OUR ADVENTURE ♥
+    </button>
+
+    <div class="smallnote">
+      MADE WITH LOVE FOR PAOPAO • MARCH 20, 2024 → NOVEMBER 20, 2026
+    </div>
+  </div>
+</div>
+
+<!-- PAUSE SCREEN -->
+
+<div class="overlay" id="pauseScreen">
+  <div class="menuCard panel">
+    <div class="logoheart">Ⅱ</div>
+    <h1>Take a little break</h1>
+    <p class="subtitle">Your adventure is right where you left it, love.</p>
+    <div style="margin-top:20px;">
+      <button class="mainbtn" id="resumeBtn">KEEP GOING</button>
+      <button class="mainbtn secondary" id="restartBtn">RESTART</button>
+    </div>
+  </div>
+</div>
+
+<!-- POLAROID MEMORY MODAL -->
+
+<div class="overlay" id="memoryOverlay" aria-hidden="true">
+  <div class="polaroidCard">
+    <div class="polaroidBadge" id="memoryBadge">MEMORY 1 / 4</div>
+    <canvas id="polaroidCanvas" width="360" height="190"></canvas>
+    <h3 id="memoryTitle">First hi in CSAB Retreat House</h3>
+    <p id="memoryText">Where our little story began.</p>
+    <button class="mainbtn" id="closeMemoryBtn" style="width:100%;">KEEP ADVENTURE GOING ♡</button>
+  </div>
+</div>
+
+<!-- NOVEMBER 20, 2026 LETTER -->
+
+<div class="overlay" id="message" aria-hidden="true">
+  <div class="letter" role="dialog" aria-modal="true" aria-labelledby="letterHeading">
+    <div class="bigheart">♥</div>
+
+    <h1 id="letterHeading">Happy Monthsary, Paopao!</h1>
+    <h2>March 20, 2024 → November 20, 2026</h2>
+
+    <div class="counterPill">
+      ♥ 975 Days Together • 2 Years &amp; 8 Months ♥
+    </div>
+
+    <div class="letterBody">
+      <p><strong>2 years and 8 months with you.</strong></p>
+
+      <p>
+        Out of all the places this little character could go, I wanted the final stop to be right here with you.
+      </p>
+
+      <p>
+        From our very first <strong>hi in CSAB during recollection</strong>, to <strong>every laughy we do</strong> until our tummy owie, and <strong>every car ride we do</strong> just talking and singing along together, thank you for making every ordinary day feel really nice bebu.
+      </p>
+
+      <p>
+        Through every season, every challenge, and every little adventure, you are still the person I always want beside me.
+      </p>
+
+      <p>
+        I hope this tiny game reminds you how much you mean to me. I will always find little ways to make you smile.
+      </p>
+    </div>
+
+    <div class="letterSignoff">
+      I love you, Paopao. Palagi. ♡
+    </div>
+
+    <div class="date">
+      March 20, 2024 • November 20, 2026
+    </div>
+
+    <div class="letterActions">
+      <button id="fireworksBtn" type="button">✨ CELEBRATE WITH HEARTS</button>
+      <button id="close" type="button">BACK TO OUR ADVENTURE</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+"use strict";
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const pCanvas = document.getElementById("polaroidCanvas");
+const pCtx = pCanvas.getContext("2d");
+const $ = id => document.getElementById(id);
+
+const C = {
+  sky:"#bfe5f2",
+  grass:"#689d4b",
+  dirt:"#946d6d",
+  skin:"#fdf4d2",
+  shirt:"#b0cde6",
+  pants:"#a290b7",
+  pink:"#e99ab7",
+  cream:"#fff6dd",
+  ink:"#674e64",
+  gold:"#f3ce77"
+};
+
+let W = 0, H = 0, DPR = 1;
+
+function resize() {
+  W = innerWidth;
+  H = innerHeight;
+  DPR = Math.min(devicePixelRatio || 1, 2);
+
+  canvas.width = Math.round(W * DPR);
+  canvas.height = Math.round(H * DPR);
+  canvas.style.width = W + "px";
+  canvas.style.height = H + "px";
+
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+}
+
+addEventListener("resize", resize);
+resize();
+
+const WORLD = 6200;
+
+/* LEVEL DESIGN: SOLID PLATFORMS, MOVING CLOUDS & FRAGILE CLOUDS */
+const basePlatforms = [
+  {x:0, y:560, w:620, type:"solid"},
+  {x:720, y:490, w:260, type:"solid"},
+  {x:1080, y:420, w:320, type:"solid"},
+  {x:1490, y:510, w:290, type:"solid"},
+  {x:1870, y:435, w:290, type:"solid"},
+  {x:2230, y:360, w:260, type:"solid"},
+  {x:2580, y:480, w:340, type:"solid"},
+  {x:3240, y:495, w:310, type:"solid"},
+  {x:3640, y:415, w:290, type:"solid"},
+  {x:4020, y:340, w:310, type:"solid"},
+  {x:4430, y:455, w:340, type:"solid"},
+  {x:5160, y:390, w:270, type:"solid"},
+  {x:5500, y:480, w:700, type:"solid"}
+];
+
+const movingPlatformConfigs = [
+  {x:2970, y:415, w:170, axis:"x", range:90, speed:1.5, phase:0},
+  {x:4840, y:430, w:170, axis:"y", range:65, speed:1.8, phase:1.2}
+];
+
+const fragileCloudConfigs = [
+  {x:1395, y:340, w:115},
+  {x:2515, y:310, w:115},
+  {x:3945, y:310, w:115},
+  {x:5055, y:340, w:115}
+];
+
+const mushroomConfigs = [
+  {x:1630, y:510},
+  {x:2760, y:480},
+  {x:4610, y:455}
+];
+
+const heartPositions = [
+  [420,495],[830,425],[1210,355],[1630,360],
+  [2000,370],[2340,295],[2760,330],[3055,345],
+  [3380,430],[3770,350],[4160,270],[4610,305]
+];
+
+const petalPositions = [
+  [300,520],[920,450],[1290,380],[1720,470],
+  [2080,395],[2440,320],[2840,440],[3460,455]
+];
+
+const memorySpots = [
+  {
+    x: 1140, y: 420,
+    title: "First hi in CSAB Retreat House",
+    date: "Memory 1 • First Hello",
+    scene: "csab",
+    note: "Our very first hi hi in CSAB when we made recollection hehe everything started here.",
+    done: false
+  },
+  {
+    x: 2690, y: 480,
+    title: "Every laughter we do",
+    date: "Memory 2 • Endless Laughs",
+    scene: "laugh",
+    note: "Every laughy we do, random smileys, and moments that makes us feel really nicey.",
+    done: false
+  },
+  {
+    x: 4120, y: 340,
+    title: "Every car rides we do",
+    date: "Memory 3 • Road Trips Together",
+    scene: "carride",
+    note: "Every car rides we do, making sing together, talky about random stuff, and enjoying the view right next to you.",
+    done: false
+  },
+  {
+    x: 5250, y: 390,
+    title: "How long we're together",
+    date: "March 20, 2024 → Nov 20, 2026",
+    scene: "together",
+    note: "2 years and 8 months (975 days) of being together and I still look forward to every single day ahead.",
+    done: false
+  }
+];
+
+const checkpoints = [
+  {x:70, y:560, label:"START"},
+  {x:2640, y:480, label:"FLOWER HILL"},
+  {x:4490, y:455, label:"STARLIGHT PATH"}
+];
+
+const goal = {x: 5900, y: 355};
+const lukeNPC = {x: 5765, y: 480};
+const secretStar = {x: 5295, y: 265, taken: false};
+
+let player;
+let companion;
+let platforms = [];
+let mushrooms = [];
+let hearts = [];
+let petals = [];
+let particles = [];
+let floatingTexts = [];
+let ribbonTrail = [];
+let ambientDust = [];
+
+let camera = 0;
+let score = 0;
+let petalCount = 0;
+let memoryCount = 0;
+let starFound = false;
+let checkpoint = 0;
+let comboCount = 0;
+let comboTimer = 0;
+
+let started = false;
+let paused = false;
+let nearGoal = false;
+let soundOn = true;
+let musicOn = true;
+let elapsed = 0;
+let celebrationMode = false;
+let celebrationTimer = 0;
+
+let audio = null;
+let musicInterval = null;
+let musicNoteIdx = 0;
+let usingMp3 = false;
+let toastTimer = null;
+let last = performance.now();
+let dtLast = 0;
+
+const bgMusic = $("bgMusic");
+bgMusic.volume = 0.28;
+
+const input = {
+  left: false,
+  right: false,
+  jump: false,
+  dash: false
+};
+
+/* UTILITY HELPERS */
+function sx(x) {
+  return x - camera;
+}
+
+function rand(a, b) {
+  return a + Math.random() * (b - a);
+}
+
+function toast(text) {
+  const el = $("toast");
+  el.textContent = text;
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    el.classList.remove("show");
+  }, 2000);
+}
+
+function hexToRgb(hex) {
+  const clean = hex.replace("#", "");
+  const num = parseInt(clean, 16);
+  return {
+    r: (num >> 16) & 255,
+    g: (num >> 8) & 255,
+    b: num & 255
+  };
+}
+
+function lerpColor(hexA, hexB, t) {
+  const k = Math.max(0, Math.min(1, t));
+  const a = hexToRgb(hexA);
+  const b = hexToRgb(hexB);
+  const r = Math.round(a.r + (b.r - a.r) * k);
+  const g = Math.round(a.g + (b.g - a.g) * k);
+  const bl = Math.round(a.b + (b.b - a.b) * k);
+  return `rgb(${r},${g},${bl})`;
+}
+
+function addFloatingText(x, y, text, color = "#d67e9e") {
+  floatingTexts.push({
+    x,
+    y,
+    text,
+    color,
+    vy: -48,
+    life: 0.95,
+    max: 0.95
+  });
+}
+
+function burst(x, y, n = 16, customColor = null) {
+  for (let i = 0; i < n; i++) {
+    particles.push({
+      x,
+      y,
+      vx: rand(-190, 190),
+      vy: rand(-230, 75),
+      life: rand(0.45, 0.95),
+      max: 0.95,
+      size: rand(3, 7),
+      heart: Math.random() > 0.52,
+      color: customColor || (Math.random() > 0.5 ? C.pink : C.gold)
+    });
+  }
+}
+
+function launchHeartFireworks() {
+  celebrationMode = true;
+  celebrationTimer = 0.2;
+  const centerX = nearGoal ? goal.x : player.x + 17;
+  const centerY = nearGoal ? goal.y - 30 : player.y - 40;
+  for (let k = 0; k < 3; k++) {
+    burst(centerX + rand(-140, 140), centerY + rand(-90, 30), 22);
+  }
+}
+
+/* AUDIO & PROCEDURAL LULLABY FALLBACK */
+function ensureAudio() {
+  try {
+    if (!audio) {
+      audio = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audio.state === "suspended") {
+      audio.resume();
+    }
+  } catch (e) {}
+}
+
+function beep(freq = 660, dur = 0.09, type = "sine", vol = 0.035, slideTo = null) {
+  if (!soundOn) return;
+  try {
+    ensureAudio();
+    if (!audio) return;
+
+    const now = audio.currentTime;
+    const o = audio.createOscillator();
+    const g = audio.createGain();
+
+    o.type = type;
+    o.frequency.setValueAtTime(freq, now);
+    if (slideTo) {
+      o.frequency.exponentialRampToValueAtTime(Math.max(40, slideTo), now + dur);
+    }
+
+    g.gain.setValueAtTime(vol, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+    o.connect(g);
+    g.connect(audio.destination);
+
+    o.start(now);
+    o.stop(now + dur);
+  } catch (e) {}
+}
+
+function chime(combo = 0) {
+  const pitchBoost = Math.min(combo * 35, 210);
+  beep(523.25 + pitchBoost, 0.12, "sine", 0.036);
+  setTimeout(() => beep(659.25 + pitchBoost, 0.12, "sine", 0.036), 85);
+  setTimeout(() => beep(783.99 + pitchBoost, 0.2, "triangle", 0.038), 170);
+}
+
+function dashSFX() {
+  beep(320, 0.12, "triangle", 0.032, 740);
+  setTimeout(() => beep(680, 0.1, "sine", 0.025, 920), 45);
+}
+
+function boingSFX() {
+  beep(240, 0.16, "sine", 0.04, 680);
+}
+
+const lullabyNotes = [
+  523.25, 659.25, 783.99, 659.25,
+  587.33, 783.99, 880.00, 783.99,
+  659.25, 783.99, 987.77, 880.00,
+  783.99, 659.25, 587.33, 659.25
+];
+
+function startLullabyLoop() {
+  if (musicInterval) clearInterval(musicInterval);
+  musicInterval = setInterval(() => {
+    if (!musicOn || paused || usingMp3 || !started) return;
+    const freq = lullabyNotes[musicNoteIdx % lullabyNotes.length];
+    musicNoteIdx++;
+    beep(freq, 0.28, "sine", 0.016);
+  }, 460);
+}
+
+async function startMusic() {
+  if (!musicOn) return;
+  try {
+    await bgMusic.play();
+    usingMp3 = true;
+    $("musicBtn").textContent = "♫";
+  } catch (e) {
+    usingMp3 = false;
+    $("musicBtn").textContent = "♫";
+    startLullabyLoop();
+  }
+}
+
+function toggleMusic() {
+  musicOn = !musicOn;
+  if (musicOn) {
+    startMusic();
+    toast("Music on ♫");
+  } else {
+    bgMusic.pause();
+    if (musicInterval) {
+      clearInterval(musicInterval);
+      musicInterval = null;
+    }
+    $("musicBtn").textContent = "♪";
+    toast("Music paused ♪");
+  }
+}
+
+/* AMBIENT PARTICLES (BUTTERFLIES, FIREFLIES, PETALS) */
+function initAmbient() {
+  ambientDust = [];
+  for (let i = 0; i < 65; i++) {
+    ambientDust.push({
+      x: Math.random() * WORLD,
+      y: 80 + Math.random() * 440,
+      size: 2 + Math.random() * 3.5,
+      phase: Math.random() * Math.PI * 2,
+      speedX: -12 - Math.random() * 18,
+      speedY: 8 + Math.random() * 16
+    });
+  }
+}
+
+/* RESET & HUD UPDATES */
+function reset() {
+  player = {
+    x: 70,
+    y: 440,
+    w: 34,
+    h: 56,
+    vx: 0,
+    vy: 0,
+    onGround: false,
+    wasOnGround: false,
+    face: 1,
+    coyote: 0,
+    jumpBuffer: 0,
+    jumpsLeft: 2,
+    dashTimer: 0,
+    dashCooldown: 0,
+    squashX: 1,
+    squashY: 1
+  };
+
+  companion = {
+    x: player.x - 30,
+    y: player.y + 10,
+    happyTimer: 0
+  };
+
+  platforms = [
+    ...basePlatforms.map(p => ({...p})),
+    ...movingPlatformConfigs.map(m => ({
+      ...m,
+      type: "moving",
+      ox: m.x,
+      oy: m.y,
+      dx: 0,
+      dy: 0
+    })),
+    ...fragileCloudConfigs.map(f => ({
+      ...f,
+      type: "fragile",
+      state: "solid",
+      timer: 0
+    }))
+  ];
+
+  mushrooms = mushroomConfigs.map(m => ({
+    ...m,
+    bounceAnim: 0
+  }));
+
+  hearts = heartPositions.map((p, i) => ({
+    x: p[0],
+    y: p[1],
+    taken: false,
+    phase: i * 0.83
+  }));
+
+  petals = petalPositions.map((p, i) => ({
+    x: p[0],
+    y: p[1],
+    taken: false,
+    phase: i * 0.9
+  }));
+
+  memorySpots.forEach(m => (m.done = false));
+  secretStar.taken = false;
+
+  score = 0;
+  petalCount = 0;
+  memoryCount = 0;
+  starFound = false;
+  checkpoint = 0;
+  comboCount = 0;
+  comboTimer = 0;
+
+  camera = 0;
+  particles = [];
+  floatingTexts = [];
+  ribbonTrail = [];
+  celebrationMode = false;
+  celebrationTimer = 0;
+  nearGoal = false;
+  elapsed = 0;
+
+  input.left = false;
+  input.right = false;
+  input.jump = false;
+  input.dash = false;
+
+  initAmbient();
+  updateHUD();
+  updateQuests();
+}
+
+function updateHUD() {
+  $("loveCount").textContent = score + " / 12";
+
+  const pct = Math.max(0, Math.min(100, (player.x / (goal.x - 120)) * 100));
+  $("progress").style.width = pct + "%";
+  $("progressHeart").style.left = pct + "%";
+
+  const dashRatio = Math.max(0, Math.min(1, 1 - player.dashCooldown / 0.85));
+  $("dashBar").style.width = dashRatio * 100 + "%";
+
+  const dashBtnEl = $("dashBtn");
+  if (dashBtnEl) {
+    if (player.dashCooldown > 0) {
+      dashBtnEl.classList.add("cooling");
+      dashBtnEl.classList.remove("ready");
+    } else {
+      dashBtnEl.classList.remove("cooling");
+      dashBtnEl.classList.add("ready");
+    }
+  }
+
+  const actionBtnEl = $("action");
+  if (actionBtnEl) {
+    actionBtnEl.classList.toggle("highlight", nearGoal);
+  }
+
+  const zoneBadgeEl = $("zoneBadge");
+  if (zoneBadgeEl) {
+    if (player.x < 2200) {
+      zoneBadgeEl.textContent = "☀ MORNING MEADOW";
+    } else if (player.x < 4200) {
+      zoneBadgeEl.textContent = "🌅 FLOWER HILL SUNSET";
+    } else {
+      zoneBadgeEl.textContent = "🌸 STARLIGHT BLOSSOM PATH";
+    }
+  }
+}
+
+function updateQuests() {
+  $("petalQuest").textContent = petalCount + " / 8";
+  $("memoryQuest").textContent = memoryCount + " / 4";
+  $("starQuest").textContent = (starFound ? 1 : 0) + " / 1";
+  $("checkpointTag").textContent = "CHECKPOINT: " + checkpoints[checkpoint].label;
+}
+
+reset();
+
+/* POLAROID SCENE ILLUSTRATOR FOR ALL 4 MEMORIES */
+function drawPolaroidScene(sceneType) {
+  const w = pCanvas.width;
+  const h = pCanvas.height;
+  pCtx.clearRect(0, 0, w, h);
+
+  if (sceneType === "csab") {
+    // 1st Memory: First hi in CSAB Retreat House
+    pCtx.fillStyle = "#bfe5f2";
+    pCtx.fillRect(0, 0, w, h);
+    pCtx.fillStyle = "#fff6dd";
+    pCtx.beginPath(); pCtx.arc(58, 42, 20, 0, Math.PI * 2); pCtx.fill();
+
+    // Retreat House building
+    pCtx.fillStyle = "#fff8ec";
+    pCtx.strokeStyle = "#946d6d";
+    pCtx.lineWidth = 2.5;
+    pCtx.beginPath();
+    pCtx.roundRect(110, 62, 140, 78, 6);
+    pCtx.fill();
+    pCtx.stroke();
+
+    // Pitched roof
+    pCtx.fillStyle = "#e99ab7";
+    pCtx.beginPath();
+    pCtx.moveTo(100, 65);
+    pCtx.lineTo(180, 26);
+    pCtx.lineTo(260, 65);
+    pCtx.closePath();
+    pCtx.fill();
+    pCtx.stroke();
+
+    // Door & windows
+    pCtx.fillStyle = "#946d6d";
+    pCtx.fillRect(168, 102, 24, 38);
+    pCtx.fillStyle = "#f3ce77";
+    pCtx.fillRect(126, 82, 24, 20);
+    pCtx.fillRect(210, 82, 24, 20);
+
+    // Grass & greeting
+    pCtx.fillStyle = "#82b75e";
+    pCtx.fillRect(0, 140, w, 50);
+    drawMiniChibi(pCtx, 138, 128, "#b0cde6", "#674e64", 1);
+    drawMiniChibi(pCtx, 222, 128, "#e99ab7", "#674e64", -1);
+
+    pCtx.fillStyle = "#9e2a5b";
+    pCtx.font = "900 13px system-ui";
+    pCtx.textAlign = "center";
+    pCtx.fillText("Hi! ♡", 180, 92);
+  } else if (sceneType === "laugh") {
+    // 2nd Memory: Every laughter we do
+    pCtx.fillStyle = "#fde4ec";
+    pCtx.fillRect(0, 0, w, h);
+    pCtx.fillStyle = "#f3ce77";
+    for (let i = 0; i < 14; i++) {
+      pCtx.beginPath();
+      pCtx.arc(28 + i * 24, 28 + (i % 3) * 18, 4, 0, Math.PI * 2);
+      pCtx.fill();
+    }
+    pCtx.fillStyle = "#94c18d";
+    pCtx.fillRect(0, 148, w, 45);
+    drawMiniChibi(pCtx, 152, 114, "#b0cde6", "#674e64", 1);
+    drawMiniChibi(pCtx, 208, 114, "#e99ab7", "#674e64", -1);
+
+    pCtx.fillStyle = "#9e2a5b";
+    pCtx.font = "900 15px system-ui";
+    pCtx.textAlign = "center";
+    pCtx.fillText("HAHAHA! ♡ ♪", 180, 74);
+  } else if (sceneType === "carride") {
+    // 3rd Memory: Every car rides we do
+    const grad = pCtx.createLinearGradient(0, 0, 0, h);
+    grad.addColorStop(0, "#f5b0bd");
+    grad.addColorStop(0.65, "#fbd1a2");
+    grad.addColorStop(1, "#fff6dd");
+    pCtx.fillStyle = grad;
+    pCtx.fillRect(0, 0, w, h);
+
+    // Road & dashed center line
+    pCtx.fillStyle = "#5a4d5c";
+    pCtx.fillRect(0, 144, w, 46);
+    pCtx.fillStyle = "#fff6dd";
+    for (let rx = 12; rx < w; rx += 46) {
+      pCtx.fillRect(rx, 165, 24, 4);
+    }
+
+    // Cute car body
+    pCtx.fillStyle = "#fffdf7";
+    pCtx.strokeStyle = "#946d6d";
+    pCtx.lineWidth = 2.5;
+    pCtx.beginPath();
+    pCtx.roundRect(105, 106, 150, 38, 12);
+    pCtx.fill();
+    pCtx.stroke();
+
+    // Car cabin & windows
+    pCtx.fillStyle = "#b0cde6";
+    pCtx.beginPath();
+    pCtx.roundRect(128, 82, 102, 28, 10);
+    pCtx.fill();
+    pCtx.stroke();
+
+    drawMiniChibi(pCtx, 156, 74, "#b0cde6", "#674e64", 1);
+    drawMiniChibi(pCtx, 202, 74, "#e99ab7", "#674e64", 1);
+
+    // Wheels
+    pCtx.fillStyle = "#674e64";
+    pCtx.beginPath();
+    pCtx.arc(138, 144, 12, 0, Math.PI * 2);
+    pCtx.arc(222, 144, 12, 0, Math.PI * 2);
+    pCtx.fill();
+
+    pCtx.fillStyle = "#e99ab7";
+    pCtx.font = "900 16px system-ui";
+    pCtx.textAlign = "center";
+    pCtx.fillText("♥ ROAD TRIP ♥", 180, 42);
+  } else {
+    // 4th Memory: How long we're together
+    const grad = pCtx.createLinearGradient(0, 0, 0, h);
+    grad.addColorStop(0, "#4e456e");
+    grad.addColorStop(1, "#a290b7");
+    pCtx.fillStyle = grad;
+    pCtx.fillRect(0, 0, w, h);
+
+    pCtx.fillStyle = "#fff6dd";
+    for (let i = 0; i < 18; i++) {
+      pCtx.fillRect((i * 47) % w, (i * 29) % 105, 3, 3);
+    }
+
+    pCtx.fillStyle = "#689d4b";
+    pCtx.fillRect(0, 148, w, 45);
+    drawMiniChibi(pCtx, 148, 114, "#b0cde6", "#674e64", 1);
+    drawMiniChibi(pCtx, 212, 114, "#e99ab7", "#674e64", -1);
+
+    pCtx.fillStyle = "#fff6dd";
+    pCtx.font = "900 15px system-ui";
+    pCtx.textAlign = "center";
+    pCtx.fillText("2Y 8M • 975 DAYS ♡", 180, 74);
+  }
+}
+
+function drawMiniChibi(c, x, y, shirtColor, hairColor, face) {
+  c.save();
+  c.translate(x, y);
+  c.scale(face, 1);
+  c.fillStyle = hairColor;
+  c.fillRect(-9, 0, 18, 8);
+  c.fillStyle = "#fdf4d2";
+  c.fillRect(-7, 7, 14, 12);
+  c.fillStyle = "#674e64";
+  c.fillRect(2, 11, 2.5, 2.5);
+  c.fillStyle = shirtColor;
+  c.fillRect(-8, 19, 16, 11);
+  c.restore();
+}
+
+function openMemoryCard(m) {
+  m.done = true;
+  memoryCount++;
+  updateQuests();
+  burst(m.x, m.y - 15, 26);
+  chime(3);
+
+  $("memoryBadge").textContent = `POLAROID MEMORY ${memoryCount} / 4 • ${m.date}`;
+  $("memoryTitle").textContent = m.title;
+  $("memoryText").textContent = m.note;
+  drawPolaroidScene(m.scene);
+
+  input.left = false;
+  input.right = false;
+  input.jump = false;
+  input.dash = false;
+
+  $("memoryOverlay").classList.add("show");
+  $("memoryOverlay").setAttribute("aria-hidden", "false");
+}
+
+function closeMemoryCard() {
+  $("memoryOverlay").classList.remove("show");
+  $("memoryOverlay").setAttribute("aria-hidden", "true");
+}
+
+function questReward(message, x, y) {
+  burst(x, y, 24);
+  chime(comboCount);
+  toast(message);
+  updateQuests();
+}
+
+/* RENDERING HELPERS */
+function drawHeart(x, y, s = 1, alpha = 1, fill = C.pink) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.translate(sx(x), y);
+  ctx.scale(s, s);
+
+  ctx.beginPath();
+  ctx.moveTo(0, 12);
+  ctx.bezierCurveTo(-31, -8, -30, -36, -13, -39);
+  ctx.bezierCurveTo(-3, -41, 3, -34, 0, -23);
+  ctx.bezierCurveTo(4, -34, 12, -41, 23, -39);
+  ctx.bezierCurveTo(40, -35, 39, -8, 0, 12);
+
+  ctx.fillStyle = fill;
+  ctx.fill();
+
+  ctx.strokeStyle = C.dirt;
+  ctx.lineWidth = 3.5;
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+function cloud(x, y, s, alpha = 0.82) {
+  const screenX = sx(x);
+  if (screenX < -160 || screenX > W + 160) return;
+  ctx.fillStyle = `rgba(255,246,221,${alpha})`;
+  ctx.beginPath();
+  ctx.arc(screenX, y, 25 * s, 0, Math.PI * 2);
+  ctx.arc(screenX + 31 * s, y - 13 * s, 33 * s, 0, Math.PI * 2);
+  ctx.arc(screenX + 65 * s, y, 24 * s, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+/* DYNAMIC BIOME & TIME-OF-DAY BACKGROUND */
+function background() {
+  const tSunset = Math.max(0, Math.min(1, (camera - 1900) / 900));
+  const tNight = Math.max(0, Math.min(1, (camera - 3900) / 900));
+
+  let topSky = lerpColor("#bfe5f2", "#e89bb4", tSunset);
+  topSky = lerpColor(topSky, "#3d365c", tNight);
+
+  let midSky = lerpColor("#dff3fa", "#fbd1a2", tSunset);
+  midSky = lerpColor(midSky, "#7c6999", tNight);
+
+  let botSky = lerpColor("#fff6dd", "#ffe7ba", tSunset);
+  botSky = lerpColor(botSky, "#c99bb8", tNight);
+
+  const skyGrad = ctx.createLinearGradient(0, 0, 0, H);
+  skyGrad.addColorStop(0, topSky);
+  skyGrad.addColorStop(0.55, midSky);
+  skyGrad.addColorStop(1, botSky);
+  ctx.fillStyle = skyGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  if (tNight > 0.05) {
+    ctx.save();
+    for (let i = 0; i < 48; i++) {
+      const stX = (i * 197) % (W + 120);
+      const stY = 28 + ((i * 89) % Math.round(H * 0.48));
+      const twinkle = 0.45 + 0.55 * Math.sin(elapsed * 3.2 + i * 1.7);
+      ctx.globalAlpha = tNight * twinkle;
+      ctx.fillStyle = i % 4 === 0 ? C.gold : "#ffffff";
+      ctx.beginPath();
+      ctx.arc(stX, stY, i % 5 === 0 ? 2.4 : 1.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = tNight * 0.92;
+    const moonX = W * 0.82;
+    const moonY = 92;
+    ctx.fillStyle = "#fff6dd";
+    ctx.beginPath();
+    ctx.arc(moonX, moonY, 28, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = topSky;
+    ctx.beginPath();
+    ctx.arc(moonX + 11, moonY - 7, 24, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  if (tNight < 0.95) {
+    ctx.save();
+    ctx.globalAlpha = (1 - tNight) * 0.85;
+    const sunX = W * 0.78 - tSunset * 80;
+    const sunY = 95 + tSunset * 110;
+    ctx.fillStyle = tSunset > 0.4 ? "#ffe29a" : "#fff9e6";
+    ctx.beginPath();
+    ctx.arc(sunX, sunY, 36 + tSunset * 12, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  const hillPalettes = [
+    ["#c8e4c2", "#b0d39e", "#94c18d"],
+    ["#d8a7b8", "#b98aa8", "#967293"],
+    ["#6e628c", "#584e75", "#463e61"]
+  ];
+
+  for (let layer = 0; layer < 3; layer++) {
+    let col = lerpColor(hillPalettes[0][layer], hillPalettes[1][layer], tSunset);
+    col = lerpColor(col, hillPalettes[2][layer], tNight);
+    ctx.fillStyle = col;
+
+    ctx.beginPath();
+    const base = H * (0.53 + layer * 0.085);
+    const amp = 30 + layer * 14;
+
+    ctx.moveTo(0, H);
+    ctx.lineTo(0, base);
+
+    for (let x = 0; x < W + 100; x += 90) {
+      const worldX = x + camera * (0.12 + layer * 0.1);
+      ctx.lineTo(x, base + Math.sin(worldX * 0.004 + layer * 2) * amp);
+    }
+
+    ctx.lineTo(W, H);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  const cloudAlpha = Math.max(0.25, 0.8 - tNight * 0.48);
+  for (let i = 0; i < 14; i++) {
+    cloud(i * 540 + 90, 68 + (i % 4) * 44, 0.55 + (i % 3) * 0.12, cloudAlpha);
+  }
+
+  for (const d of ambientDust) {
+    const px = sx(d.x);
+    if (px < -30 || px > W + 30) continue;
+    const py = d.y + Math.sin(elapsed * 2 + d.phase) * 14;
+    ctx.save();
+    if (d.x < 2500) {
+      const flap = Math.abs(Math.sin(elapsed * 9 + d.phase));
+      ctx.fillStyle = "#fff6dd";
+      ctx.beginPath();
+      ctx.ellipse(px - 3 * flap, py, 4 * flap, 3, 0, 0, Math.PI * 2);
+      ctx.ellipse(px + 3 * flap, py, 4 * flap, 3, 0, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (d.x < 4400) {
+      ctx.globalAlpha = 0.45 + 0.55 * Math.sin(elapsed * 4 + d.phase);
+      ctx.fillStyle = C.gold;
+      ctx.beginPath();
+      ctx.arc(px, py, d.size, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      ctx.translate(px, py);
+      ctx.rotate(elapsed + d.phase);
+      ctx.fillStyle = "#ffc2d8";
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 5, 2.8, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+}
+
+function drawPlatforms() {
+  for (const p of platforms) {
+    const x = sx(p.x);
+    if (x + p.w < -60 || x > W + 60) continue;
+
+    if (p.type === "solid") {
+      ctx.fillStyle = C.dirt;
+      ctx.fillRect(x, p.y + 17, p.w, H + 120 - p.y);
+
+      const grassTop = p.x >= 4400 ? "#5a8e58" : C.grass;
+      ctx.fillStyle = grassTop;
+      ctx.fillRect(x, p.y, p.w, 22);
+
+      ctx.fillStyle = p.x >= 4400 ? "#7db37b" : "#82b75e";
+      for (let xx = 0; xx < p.w; xx += 25) {
+        ctx.fillRect(x + xx + 5, p.y - 3, 9, 6);
+      }
+
+      ctx.fillStyle = "rgba(255,246,221,.13)";
+      for (let xx = 18; xx < p.w - 8; xx += 43) {
+        ctx.fillRect(x + xx, p.y + 48, 6, 5);
+      }
+    } else if (p.type === "moving") {
+      ctx.save();
+      ctx.fillStyle = "#fff6dd";
+      ctx.strokeStyle = C.dirt;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.roundRect(x, p.y, p.w, 24, 14);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = C.pink;
+      ctx.font = "bold 12px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("♥", x + p.w / 2, p.y + 16);
+      ctx.restore();
+    } else if (p.type === "fragile") {
+      if (p.state === "gone") continue;
+      ctx.save();
+      const shake = p.state === "shaking" ? Math.sin(elapsed * 48) * 3 : 0;
+      ctx.globalAlpha = p.state === "shaking" ? Math.max(0.3, 1 - p.timer / 1.1) : 0.95;
+      ctx.fillStyle = "#f9e4e7";
+      ctx.strokeStyle = "#d67e9e";
+      ctx.lineWidth = 2.5;
+      ctx.setLineDash([6, 4]);
+      ctx.beginPath();
+      ctx.roundRect(x + shake, p.y, p.w, 20, 12);
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+}
+
+function drawDecor() {
+  for (let x = 35; x < WORLD; x += 155) {
+    const p = platforms.find(q => q.type === "solid" && x >= q.x + 15 && x <= q.x + q.w - 15);
+    if (!p) continue;
+    const xx = sx(x);
+    if (xx < -20 || xx > W + 20) continue;
+
+    ctx.strokeStyle = "#789f55";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(xx, p.y - 2);
+    ctx.lineTo(xx + 1, p.y - 19);
+    ctx.stroke();
+
+    ctx.fillStyle = C.cream;
+    ctx.beginPath();
+    ctx.arc(xx - 4, p.y - 20, 5, 0, 7);
+    ctx.arc(xx + 5, p.y - 20, 5, 0, 7);
+    ctx.fill();
+
+    ctx.fillStyle = x >= 4400 ? "#ff9ec4" : C.pink;
+    ctx.beginPath();
+    ctx.arc(xx, p.y - 22, 4, 0, 7);
+    ctx.fill();
+  }
+}
+
+function drawMushrooms() {
+  for (const m of mushrooms) {
+    const x = sx(m.x);
+    if (x < -50 || x > W + 50) continue;
+
+    const sq = Math.sin(m.bounceAnim * Math.PI) * 0.35;
+    const scaleX = 1 + sq;
+    const scaleY = 1 - sq;
+
+    ctx.save();
+    ctx.translate(x, m.y);
+    ctx.scale(scaleX, scaleY);
+
+    ctx.fillStyle = C.cream;
+    ctx.strokeStyle = C.dirt;
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.roundRect(-9, -16, 18, 16, 5);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = C.pink;
+    ctx.beginPath();
+    ctx.ellipse(0, -18, 22, 12, 0, Math.PI, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = C.cream;
+    ctx.beginPath();
+    ctx.arc(-9, -22, 3, 0, Math.PI * 2);
+    ctx.arc(0, -25, 3.5, 0, Math.PI * 2);
+    ctx.arc(9, -22, 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  }
+}
+
+function drawCheckpoints() {
+  checkpoints.forEach((cp, idx) => {
+    if (idx === 0) return;
+    const x = sx(cp.x);
+    if (x < -60 || x > W + 60) return;
+    const active = checkpoint >= idx;
+
+    ctx.save();
+    ctx.fillStyle = C.dirt;
+    ctx.fillRect(x - 3, cp.y - 46, 6, 46);
+    ctx.fillRect(x - 10, cp.y - 46, 20, 5);
+
+    if (active) {
+      ctx.fillStyle = "rgba(243,206,119,0.35)";
+      ctx.beginPath();
+      ctx.arc(x, cp.y - 34, 22 + Math.sin(elapsed * 4) * 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.fillStyle = active ? C.gold : "#d8cfc6";
+    ctx.strokeStyle = C.ink;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(x - 8, cp.y - 41, 16, 16, 4);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.restore();
+  });
+}
+
+function drawPetal(x, y, phase) {
+  const bob = Math.sin(elapsed * 3 + phase) * 5;
+  ctx.save();
+  ctx.translate(sx(x), y + bob);
+
+  ctx.fillStyle = C.gold;
+  ctx.strokeStyle = C.dirt;
+  ctx.lineWidth = 2;
+
+  for (let i = 0; i < 5; i++) {
+    ctx.rotate((Math.PI * 2) / 5);
+    ctx.beginPath();
+    ctx.ellipse(0, -8, 4, 8, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+  }
+
+  ctx.fillStyle = C.cream;
+  ctx.beginPath();
+  ctx.arc(0, 0, 3, 0, 7);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+function drawMemorySpot(m) {
+  const x = sx(m.x);
+  if (x < -60 || x > W + 60) return;
+
+  ctx.save();
+  const pulse = Math.sin(elapsed * 3.5 + m.x) * 3;
+
+  if (!m.done) {
+    ctx.strokeStyle = C.cream;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(x, m.y - 22, 18 + pulse, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.fillStyle = "#fffdf7";
+    ctx.strokeStyle = C.dirt;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(x - 10, m.y - 33, 20, 22, 3);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = C.pink;
+    ctx.fillRect(x - 7, m.y - 30, 14, 12);
+
+    ctx.fillStyle = C.cream;
+    ctx.font = "900 10px system-ui";
+    ctx.textAlign = "center";
+    ctx.fillText("📸 MEMORY", x, m.y - 46);
+  } else {
+    ctx.globalAlpha = 0.65;
+    ctx.fillStyle = C.gold;
+    ctx.font = "bold 14px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("✓", x, m.y - 16);
+  }
+
+  ctx.restore();
+}
+
+function drawSecretStar() {
+  if (secretStar.taken) return;
+  const y = secretStar.y + Math.sin(elapsed * 4) * 6;
+  ctx.save();
+  ctx.translate(sx(secretStar.x), y);
+  ctx.rotate(elapsed * 0.7);
+
+  ctx.font = "bold 34px sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillStyle = C.gold;
+  ctx.strokeStyle = C.ink;
+  ctx.lineWidth = 2;
+
+  ctx.fillText("★", 0, 10);
+  ctx.strokeText("★", 0, 10);
+  ctx.restore();
+}
+
+function drawCompanion() {
+  const x = sx(companion.x);
+  const y = companion.y + Math.sin(elapsed * 4.5) * 5;
+
+  ctx.save();
+  ctx.translate(x, y);
+
+  ctx.fillStyle = "rgba(255,246,221,0.45)";
+  ctx.beginPath();
+  ctx.arc(0, 0, 14, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = C.cream;
+  ctx.strokeStyle = C.dirt;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.ellipse(-4, -12, 3, 7, -0.15, 0, Math.PI * 2);
+  ctx.ellipse(4, -12, 3, 7, 0.15, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(0, 0, 9, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = C.ink;
+  ctx.fillRect(-4, -2, 2, 2.5);
+  ctx.fillRect(2, -2, 2, 2.5);
+  ctx.fillStyle = C.pink;
+  ctx.fillRect(-6, 1, 2.5, 2);
+  ctx.fillRect(3.5, 1, 2.5, 2);
+
+  if (companion.happyTimer > 0) {
+    ctx.fillStyle = C.pink;
+    ctx.font = "bold 12px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("♥", 0, -21);
+  }
+
+  ctx.restore();
+}
+
+function drawLukeNPC() {
+  const x = sx(lukeNPC.x);
+  if (x < -100 || x > W + 100) return;
+  const y = lukeNPC.y - 56 + Math.sin(elapsed * 3.5) * 1.5;
+
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(-1, 1);
+
+  ctx.globalAlpha = 0.18;
+  ctx.fillStyle = "#3c5360";
+  ctx.beginPath();
+  ctx.ellipse(0, 58, 17, 4, 0, 0, 7);
+  ctx.fill();
+  ctx.globalAlpha = 1;
+
+  ctx.fillStyle = "#4d3b4b";
+  ctx.fillRect(-11, -1, 23, 10);
+  ctx.fillRect(-13, 6, 27, 7);
+
+  ctx.fillStyle = C.skin;
+  ctx.fillRect(-9, 11, 20, 18);
+
+  ctx.fillStyle = C.ink;
+  ctx.fillRect(3, 17, 3, 4);
+  ctx.fillRect(-5, 17, 3, 4);
+  ctx.fillStyle = "#e89c9c";
+  ctx.fillRect(6, 23, 4, 3);
+
+  ctx.fillStyle = "#a290b7";
+  ctx.fillRect(-12, 29, 25, 19);
+
+  const wave = Math.sin(elapsed * 7) * 0.45;
+  ctx.save();
+  ctx.translate(12, 32);
+  ctx.rotate(-2.2 + wave);
+  ctx.fillStyle = "#a290b7";
+  ctx.fillRect(0, -3, 14, 6);
+  ctx.restore();
+
+  ctx.fillRect(-16, 32, 6, 14);
+
+  ctx.fillStyle = C.gold;
+  ctx.font = "bold 10px sans-serif";
+  ctx.fillText("♥", -4, 41);
+
+  ctx.fillStyle = "#674e64";
+  ctx.fillRect(-10, 47, 9, 10);
+  ctx.fillRect(2, 47, 9, 10);
+  ctx.fillStyle = "#3b2c39";
+  ctx.fillRect(-12, 56, 13, 4);
+  ctx.fillRect(1, 56, 13, 4);
+
+  ctx.restore();
+
+  const bx = x;
+  const by = y - 34 + Math.sin(elapsed * 2.5) * 3;
+  ctx.save();
+  ctx.fillStyle = C.cream;
+  ctx.strokeStyle = C.dirt;
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.roundRect(bx - 78, by - 16, 156, 28, 10);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = C.ink;
+  ctx.font = "900 11px system-ui";
+  ctx.textAlign = "center";
+  ctx.fillText("You made it, Paopao! ♡", bx, by + 2);
+  ctx.restore();
+}
+
+function drawPlayer() {
+  if (ribbonTrail.length > 1) {
+    ctx.save();
+    ctx.strokeStyle = C.pink;
+    ctx.lineCap = "round";
+    for (let i = 1; i < ribbonTrail.length; i++) {
+      const p0 = ribbonTrail[i - 1];
+      const p1 = ribbonTrail[i];
+      ctx.lineWidth = (i / ribbonTrail.length) * 6;
+      ctx.beginPath();
+      ctx.moveTo(sx(p0.x), p0.y);
+      ctx.lineTo(sx(p1.x), p1.y);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  const x = sx(player.x);
+  const bobY = player.onGround && Math.abs(player.vx) > 20 ? Math.sin(elapsed * 10) * 1.5 : 0;
+  const y = player.y + bobY;
+
+  ctx.save();
+  ctx.translate(x + 17, y + 56);
+  ctx.scale(player.face * player.squashX, player.squashY);
+  ctx.translate(0, -56);
+
+  ctx.globalAlpha = 0.18;
+  ctx.fillStyle = "#3c5360";
+  ctx.beginPath();
+  ctx.ellipse(0, 58, 17, 4, 0, 0, 7);
+  ctx.fill();
+  ctx.globalAlpha = 1;
+
+  ctx.fillStyle = C.ink;
+  ctx.fillRect(-10, 0, 22, 9);
+  ctx.fillRect(-14, 7, 29, 8);
+  ctx.fillStyle = C.pink;
+  ctx.fillRect(-13, 3, 6, 5);
+
+  ctx.fillStyle = C.skin;
+  ctx.fillRect(-9, 11, 20, 18);
+
+  ctx.fillStyle = C.ink;
+  ctx.fillRect(3, 17, 3, 4);
+  ctx.fillRect(-5, 17, 3, 4);
+
+  ctx.fillStyle = "#e89c9c";
+  ctx.fillRect(6, 23, 4, 3);
+
+  ctx.fillStyle = C.shirt;
+  ctx.fillRect(-12, 29, 25, 19);
+  ctx.fillRect(-16, 32, 6, 14);
+  ctx.fillRect(12, 32, 6, 14);
+
+  ctx.fillStyle = C.pink;
+  ctx.font = "bold 10px sans-serif";
+  ctx.fillText("♥", -4, 41);
+
+  const step = player.onGround && Math.abs(player.vx) > 20 ? Math.sin(elapsed * 17) * 3 : 0;
+
+  ctx.fillStyle = C.pants;
+  ctx.fillRect(-10, 47, 9, 10 + step);
+  ctx.fillRect(2, 47, 9, 10 - step);
+
+  ctx.fillStyle = C.ink;
+  ctx.fillRect(-12, 56 + step, 13, 4);
+  ctx.fillRect(1, 56 - step, 13, 4);
+
+  ctx.restore();
+}
+
+function draw() {
+  background();
+  drawPlatforms();
+  drawDecor();
+  drawMushrooms();
+  drawCheckpoints();
+
+  hearts.forEach(h => {
+    if (!h.taken) {
+      const bob = Math.sin(elapsed * 3 + h.phase) * 6;
+      drawHeart(h.x, h.y + bob, 0.52);
+    }
+  });
+
+  petals.forEach(p => {
+    if (!p.taken) drawPetal(p.x, p.y, p.phase);
+  });
+
+  memorySpots.forEach(drawMemorySpot);
+  drawSecretStar();
+
+  const gx = sx(goal.x);
+  if (gx > -200 && gx < W + 200) {
+    ctx.fillStyle = "rgba(255,246,221,.52)";
+    ctx.beginPath();
+    ctx.arc(gx, goal.y - 12, 108 + Math.sin(elapsed * 2) * 5, 0, 7);
+    ctx.fill();
+
+    ctx.fillStyle = C.gold;
+    ctx.fillRect(gx - 48, goal.y + 31, 96, 13);
+
+    ctx.fillStyle = "#fff0bc";
+    ctx.fillRect(gx - 37, goal.y + 20, 74, 12);
+
+    drawHeart(goal.x, goal.y + Math.sin(elapsed * 2.5) * 5, 2.45);
+
+    for (let i = 0; i < 8; i++) {
+      const a = elapsed * 1.2 + (i * Math.PI) / 4;
+      const r = 84 + Math.sin(elapsed * 3 + i) * 5;
+      ctx.fillStyle = "#fff8d9";
+      ctx.font = "bold 15px sans-serif";
+      ctx.fillText("✦", gx + Math.cos(a) * r, goal.y - 10 + Math.sin(a) * r);
+    }
+  }
+
+  drawLukeNPC();
+  drawCompanion();
+  drawPlayer();
+
+  particles.forEach(p => {
+    ctx.globalAlpha = Math.max(0, p.life / p.max);
+    ctx.fillStyle = p.color || (p.heart ? C.pink : C.gold);
+
+    if (p.heart) {
+      ctx.font = p.size * 2.2 + "px sans-serif";
+      ctx.fillText("♥", sx(p.x), p.y);
+    } else {
+      ctx.fillRect(sx(p.x), p.y, p.size, p.size);
+    }
+    ctx.globalAlpha = 1;
+  });
+
+  floatingTexts.forEach(ft => {
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, ft.life / ft.max);
+    ctx.font = "900 14px system-ui";
+    ctx.textAlign = "center";
+    ctx.strokeStyle = C.cream;
+    ctx.lineWidth = 4;
+    ctx.strokeText(ft.text, sx(ft.x), ft.y);
+    ctx.fillStyle = ft.color;
+    ctx.fillText(ft.text, sx(ft.x), ft.y);
+    ctx.restore();
+  });
+
+  if (nearGoal) {
+    ctx.fillStyle = C.cream;
+    ctx.strokeStyle = C.dirt;
+    ctx.lineWidth = 3;
+
+    ctx.beginPath();
+    ctx.roundRect(gx - 96, goal.y - 135, 192, 40, 12);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = C.ink;
+    ctx.textAlign = "center";
+    ctx.font = "900 13px system-ui";
+    ctx.fillText("PRESS ♡ TO READ LETTER", gx, goal.y - 110);
+  }
+}
+
+/* PLATFORM COLLISION & INTERACTIONS */
+function collide() {
+  player.wasOnGround = player.onGround;
+  player.onGround = false;
+
+  for (const p of platforms) {
+    if (p.type === "fragile" && p.state === "gone") continue;
+
+    const horizontal = player.x + player.w > p.x && player.x < p.x + p.w;
+    const oldBottom = player.y + player.h - player.vy * dtLast;
+
+    if (
+      horizontal &&
+      player.vy >= 0 &&
+      oldBottom <= p.y + 10 &&
+      player.y + player.h >= p.y
+    ) {
+      player.y = p.y - player.h;
+      player.vy = 0;
+      player.onGround = true;
+      player.coyote = 0.13;
+      player.jumpsLeft = 2;
+
+      if (p.type === "moving") {
+        player.x += p.dx;
+      }
+
+      if (p.type === "fragile" && p.state === "solid") {
+        p.state = "shaking";
+        p.timer = 0;
+      }
+
+      if (!player.wasOnGround) {
+        player.squashX = 1.22;
+        player.squashY = 0.8;
+      }
+    }
+  }
+}
+
+function updatePlatforms(dt) {
+  for (const p of platforms) {
+    if (p.type === "moving") {
+      const prevX = p.x;
+      const prevY = p.y;
+      const offset = Math.sin(elapsed * p.speed + p.phase) * p.range;
+      if (p.axis === "x") p.x = p.ox + offset;
+      else p.y = p.oy + offset;
+      p.dx = p.x - prevX;
+      p.dy = p.y - prevY;
+    } else if (p.type === "fragile") {
+      if (p.state === "shaking") {
+        p.timer += dt;
+        if (p.timer >= 1.1) {
+          p.state = "gone";
+          p.timer = 0;
+          burst(p.x + p.w / 2, p.y + 10, 10, "#fff6dd");
+        }
+      } else if (p.state === "gone") {
+        p.timer += dt;
+        if (p.timer >= 3.0) {
+          p.state = "solid";
+          p.timer = 0;
+        }
+      }
+    }
+  }
+}
+
+function triggerDash() {
+  if (player.dashCooldown > 0 || player.dashTimer > 0) return;
+  player.dashTimer = 0.18;
+  player.dashCooldown = 0.85;
+  player.vy = -40;
+  player.squashX = 1.32;
+  player.squashY = 0.76;
+  dashSFX();
+  burst(player.x + 17, player.y + 28, 14, C.pink);
+}
+
+function registerCombo(x, y, baseLabel) {
+  comboCount++;
+  comboTimer = 3.2;
+  if (comboCount >= 2) {
+    addFloatingText(x, y - 24, `${baseLabel} • COMBO ×${comboCount}!`, "#d67e9e");
+  } else {
+    addFloatingText(x, y - 20, baseLabel, "#d67e9e");
+  }
+}
+
+function update(dt) {
+  if (
+    !started ||
+    paused ||
+    $("message").classList.contains("show") ||
+    $("memoryOverlay").classList.contains("show")
+  ) {
+    if (celebrationMode) {
+      elapsed += dt;
+      celebrationTimer -= dt;
+      if (celebrationTimer <= 0) {
+        celebrationTimer = 0.7;
+        burst(goal.x + rand(-220, 220), goal.y + rand(-160, 40), 18);
+      }
+      particles.forEach(p => {
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.vy += 380 * dt;
+        p.life -= dt;
+      });
+      particles = particles.filter(p => p.life > 0);
+    }
+    return;
+  }
+
+  elapsed += dt;
+  updatePlatforms(dt);
+
+  if (comboTimer > 0) {
+    comboTimer -= dt;
+    if (comboTimer <= 0) comboCount = 0;
+  }
+
+  player.dashCooldown = Math.max(0, player.dashCooldown - dt);
+  player.squashX += (1 - player.squashX) * Math.min(1, dt * 14);
+  player.squashY += (1 - player.squashY) * Math.min(1, dt * 14);
+
+  if (input.dash) {
+    input.dash = false;
+    triggerDash();
+  }
+
+  const dir = (input.right ? 1 : 0) - (input.left ? 1 : 0);
+
+  if (player.dashTimer > 0) {
+    player.dashTimer -= dt;
+    player.vx = player.face * 620;
+    if (Math.random() > 0.35) {
+      particles.push({
+        x: player.x + 17,
+        y: player.y + 30,
+        vx: rand(-30, 30),
+        vy: rand(-30, 30),
+        life: 0.35,
+        max: 0.35,
+        size: 5,
+        heart: true
+      });
+    }
+  } else {
+    if (dir) {
+      player.face = dir;
+      player.vx += dir * 1550 * dt;
+    } else {
+      player.vx *= Math.pow(0.0003, dt);
+    }
+    player.vx = Math.max(-285, Math.min(285, player.vx));
+  }
+
+  if (player.onGround) {
+    player.coyote = 0.13;
+  } else {
+    player.coyote = Math.max(0, player.coyote - dt);
+  }
+
+  player.jumpBuffer = Math.max(0, player.jumpBuffer - dt);
+
+  if (input.jump) {
+    player.jumpBuffer = 0.14;
+    input.jump = false;
+  }
+
+  if (player.jumpBuffer > 0) {
+    if (player.coyote > 0) {
+      player.vy = -655;
+      player.onGround = false;
+      player.coyote = 0;
+      player.jumpBuffer = 0;
+      player.jumpsLeft = 1;
+      player.squashX = 0.8;
+      player.squashY = 1.24;
+      beep(390, 0.08, "triangle", 0.025, 520);
+    } else if (player.jumpsLeft > 0) {
+      player.vy = -595;
+      player.jumpsLeft = 0;
+      player.jumpBuffer = 0;
+      player.squashX = 0.78;
+      player.squashY = 1.26;
+      beep(520, 0.11, "sine", 0.032, 780);
+      burst(player.x + 17, player.y + 54, 12, C.cream);
+    }
+  }
+
+  if (player.dashTimer <= 0) {
+    player.vy += 1650 * dt;
+    player.vy = Math.min(player.vy, 860);
+  }
+
+  player.x += player.vx * dt;
+  player.y += player.vy * dt;
+
+  dtLast = dt;
+  collide();
+
+  for (const m of mushrooms) {
+    if (m.bounceAnim > 0) m.bounceAnim = Math.max(0, m.bounceAnim - dt * 3);
+    if (
+      Math.abs(player.x + 17 - m.x) < 28 &&
+      Math.abs(player.y + 56 - m.y) < 24 &&
+      player.vy >= -80
+    ) {
+      player.vy = -940;
+      player.onGround = false;
+      player.jumpsLeft = 2;
+      player.squashX = 0.74;
+      player.squashY = 1.32;
+      m.bounceAnim = 1;
+      boingSFX();
+      burst(m.x, m.y - 16, 16, C.pink);
+      addFloatingText(m.x, m.y - 34, "BOING! ♡", "#d67e9e");
+    }
+  }
+
+  ribbonTrail.push({x: player.x + 17 - player.face * 6, y: player.y + 34});
+  if (ribbonTrail.length > 9) ribbonTrail.shift();
+
+  const targetCX = player.x + 17 - player.face * 34;
+  const targetCY = player.y + 10;
+  companion.x += (targetCX - companion.x) * Math.min(1, dt * 5);
+  companion.y += (targetCY - companion.y) * Math.min(1, dt * 5);
+  companion.happyTimer = Math.max(0, companion.happyTimer - dt);
+
+  if (player.y > H + 160) {
+    player.x = checkpoints[checkpoint].x + 20;
+    player.y = checkpoints[checkpoint].y - 120;
+    player.vx = 0;
+    player.vy = 0;
+    player.jumpsLeft = 2;
+    ribbonTrail = [];
+
+    toast("Back to your checkpoint! Keep going ♡");
+    burst(player.x + 17, player.y + 28, 16);
+  }
+
+  player.x = Math.max(0, Math.min(WORLD - player.w, player.x));
+
+  for (const h of hearts) {
+    if (!h.taken && Math.hypot(player.x + 17 - h.x, player.y + 27 - h.y) < 44) {
+      h.taken = true;
+      score++;
+      companion.happyTimer = 1.4;
+      burst(h.x, h.y, 20);
+      chime(comboCount);
+      registerCombo(h.x, h.y, "+1 LOVE ♡");
+    }
+  }
+
+  for (const p of petals) {
+    if (!p.taken && Math.hypot(player.x + 17 - p.x, player.y + 27 - p.y) < 38) {
+      p.taken = true;
+      petalCount++;
+      companion.happyTimer = 1.4;
+      registerCombo(p.x, p.y, `PETAL ${petalCount}/8 🌸`);
+      questReward(
+        petalCount === 8
+          ? "FLOWER QUEST COMPLETE! A bouquet for Paopao! ♡"
+          : `Flower petal collected! ${petalCount}/8`,
+        p.x,
+        p.y
+      );
+    }
+  }
+
+  for (const m of memorySpots) {
+    if (!m.done && Math.hypot(player.x + 17 - m.x, player.y + 27 - (m.y - 20)) < 48) {
+      companion.happyTimer = 2.0;
+      openMemoryCard(m);
+      break;
+    }
+  }
+
+  if (!secretStar.taken && Math.hypot(player.x + 17 - secretStar.x, player.y + 27 - secretStar.y) < 44) {
+    secretStar.taken = true;
+    starFound = true;
+    companion.happyTimer = 2.0;
+    addFloatingText(secretStar.x, secretStar.y - 25, "SECRET STAR! ⭐", "#d67e9e");
+    questReward("SECRET STAR FOUND! ⭐", secretStar.x, secretStar.y);
+  }
+
+  for (let i = checkpoint + 1; i < checkpoints.length; i++) {
+    if (player.x > checkpoints[i].x) {
+      checkpoint = i;
+      updateQuests();
+      burst(checkpoints[i].x, checkpoints[i].y - 34, 22, C.gold);
+      chime(2);
+      toast("Checkpoint lit: " + checkpoints[i].label + " ✨");
+    }
+  }
+
+  nearGoal = Math.hypot(player.x + 17 - goal.x, player.y + 27 - goal.y) < 145;
+  if (nearGoal && !celebrationMode) {
+    celebrationMode = true;
+    launchHeartFireworks();
+  }
+
+  for (const d of ambientDust) {
+    d.x += d.speedX * dt;
+    d.y += d.speedY * dt;
+    if (d.x < 0) d.x += WORLD;
+    if (d.x > WORLD) d.x -= WORLD;
+  }
+
+  particles.forEach(p => {
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    p.vy += 450 * dt;
+    p.life -= dt;
+  });
+  particles = particles.filter(p => p.life > 0);
+
+  floatingTexts.forEach(ft => {
+    ft.y += ft.vy * dt;
+    ft.life -= dt;
+  });
+  floatingTexts = floatingTexts.filter(ft => ft.life > 0);
+
+  camera += (player.x - W * 0.36 - camera) * Math.min(1, dt * 5.8);
+  camera = Math.max(0, Math.min(WORLD - W, camera));
+
+  updateHUD();
+}
+
+function frame(now) {
+  const dt = Math.min(0.033, (now - last) / 1000);
+  last = now;
+
+  update(dt);
+  draw();
+
+  requestAnimationFrame(frame);
+}
+
+requestAnimationFrame(frame);
+
+/* GAME MENUS & LETTER ACTIONS */
+function start() {
+  started = true;
+  paused = false;
+  $("startScreen").classList.remove("show");
+  ensureAudio();
+  beep(523, 0.12);
+  startMusic();
+  toast("Let's go! Double jump & dash to explore ♡");
+}
+
+function pause() {
+  if (!started || $("message").classList.contains("show") || $("memoryOverlay").classList.contains("show")) return;
+  paused = true;
+  $("pauseScreen").classList.add("show");
+}
+
+function resume() {
+  paused = false;
+  $("pauseScreen").classList.remove("show");
+}
+
+function restart() {
+  reset();
+  started = true;
+  paused = false;
+  $("pauseScreen").classList.remove("show");
+  $("message").classList.remove("show");
+  $("memoryOverlay").classList.remove("show");
+  startMusic();
+  toast("A fresh little adventure ♡");
+}
+
+function openLetter() {
+  if (!nearGoal) {
+    toast("Luke & the big heart are waiting at the end! ♡");
+    return;
+  }
+
+  if (score === 12 && petalCount === 8 && memoryCount === 4 && starFound) {
+    toast("100% COMPLETE! EVERY PIECE OF LOVE FOUND! ♥");
+  }
+
+  $("message").classList.add("show");
+  $("message").setAttribute("aria-hidden", "false");
+
+  input.left = false;
+  input.right = false;
+  input.jump = false;
+  input.dash = false;
+
+  chime(4);
+  launchHeartFireworks();
+}
+
+function closeLetter() {
+  $("message").classList.remove("show");
+  $("message").setAttribute("aria-hidden", "true");
+}
+
+$("startBtn").onclick = start;
+$("pauseBtn").onclick = pause;
+$("resumeBtn").onclick = resume;
+$("restartBtn").onclick = restart;
+$("close").onclick = closeLetter;
+$("closeMemoryBtn").onclick = closeMemoryCard;
+$("fireworksBtn").onclick = launchHeartFireworks;
+
+$("message").addEventListener("click", e => {
+  if (e.target === $("message")) closeLetter();
+});
+
+$("memoryOverlay").addEventListener("click", e => {
+  if (e.target === $("memoryOverlay")) closeMemoryCard();
+});
+
+$("musicBtn").onclick = toggleMusic;
+
+$("soundBtn").onclick = () => {
+  soundOn = !soundOn;
+  $("soundBtn").textContent = soundOn ? "♪" : "×";
+  if (soundOn) chime();
+};
+
+/* KEYBOARD CONTROLS */
+addEventListener("keydown", e => {
+  if (["ArrowLeft", "ArrowRight", "ArrowUp", " ", "a", "A", "d", "D", "w", "W"].includes(e.key)) {
+    e.preventDefault();
+  }
+
+  if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") input.left = true;
+  if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") input.right = true;
+
+  if ((e.key === " " || e.key === "ArrowUp" || e.key === "w" || e.key === "W") && !e.repeat) {
+    input.jump = true;
+  }
+
+  if ((e.key === "Shift" || e.key === "x" || e.key === "X" || e.key === "k" || e.key === "K") && !e.repeat) {
+    input.dash = true;
+  }
+
+  if (e.key === "e" || e.key === "E" || e.key === "Enter") {
+    if ($("memoryOverlay").classList.contains("show")) closeMemoryCard();
+    else if (!started) start();
+    else openLetter();
+  }
+
+  if (e.key === "Escape" || e.key === "p" || e.key === "P") {
+    if ($("memoryOverlay").classList.contains("show")) closeMemoryCard();
+    else if ($("message").classList.contains("show")) closeLetter();
+    else if (paused) resume();
+    else pause();
+  }
+});
+
+addEventListener("keyup", e => {
+  if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") input.left = false;
+  if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") input.right = false;
+});
+
+addEventListener("blur", () => {
+  input.left = false;
+  input.right = false;
+  input.jump = false;
+  input.dash = false;
+});
+
+/* MULTI-TOUCH IPAD / MOBILE CONTROLS */
+const isTouchDevice =
+  "ontouchstart" in window ||
+  navigator.maxTouchPoints > 0 ||
+  window.matchMedia("(pointer: coarse)").matches;
+
+let touchControlsEnabled = isTouchDevice;
+
+function applyTouchVisibility() {
+  document.body.classList.toggle("touch-on", touchControlsEnabled);
+  $("touch").style.display = touchControlsEnabled ? "flex" : "none";
+  $("touchToggleBtn").style.background = touchControlsEnabled ? "#f9e4e7" : "var(--cream)";
+}
+
+applyTouchVisibility();
+
+$("touchToggleBtn").onclick = () => {
+  touchControlsEnabled = !touchControlsEnabled;
+  applyTouchVisibility();
+  toast(touchControlsEnabled ? "iPad / Touch buttons ON 🎮" : "Touch buttons hidden ⌨");
+};
+
+const dpadZone = $("dpadZone");
+const leftBtnEl = $("leftBtn");
+const rightBtnEl = $("rightBtn");
+let dpadPointerId = null;
+
+function updateDpadFromClientX(clientX) {
+  const rect = dpadZone.getBoundingClientRect();
+  const mid = rect.left + rect.width / 2;
+  if (clientX < mid) {
+    input.left = true;
+    input.right = false;
+    leftBtnEl.classList.add("pressed");
+    rightBtnEl.classList.remove("pressed");
+  } else {
+    input.left = false;
+    input.right = true;
+    rightBtnEl.classList.add("pressed");
+    leftBtnEl.classList.remove("pressed");
+  }
+}
+
+function clearDpad() {
+  dpadPointerId = null;
+  input.left = false;
+  input.right = false;
+  leftBtnEl.classList.remove("pressed");
+  rightBtnEl.classList.remove("pressed");
+}
+
+dpadZone.addEventListener("pointerdown", e => {
+  e.preventDefault();
+  dpadPointerId = e.pointerId;
+  updateDpadFromClientX(e.clientX);
+  try { dpadZone.setPointerCapture(e.pointerId); } catch (err) {}
+});
+
+dpadZone.addEventListener("pointermove", e => {
+  if (e.pointerId === dpadPointerId) {
+    e.preventDefault();
+    updateDpadFromClientX(e.clientX);
+  }
+});
+
+dpadZone.addEventListener("pointerup", e => {
+  if (e.pointerId === dpadPointerId) clearDpad();
+});
+
+dpadZone.addEventListener("pointercancel", e => {
+  if (e.pointerId === dpadPointerId) clearDpad();
+});
+
+dpadZone.addEventListener("lostpointercapture", clearDpad);
+dpadZone.addEventListener("contextmenu", e => e.preventDefault());
+
+function tapButton(id, callback) {
+  const el = $(id);
+  const release = () => el.classList.remove("pressed");
+
+  el.addEventListener("pointerdown", e => {
+    e.preventDefault();
+    el.classList.add("pressed");
+    callback();
+    try { el.setPointerCapture(e.pointerId); } catch (err) {}
+  });
+
+  el.addEventListener("pointerup", release);
+  el.addEventListener("pointercancel", release);
+  el.addEventListener("lostpointercapture", release);
+  el.addEventListener("contextmenu", e => e.preventDefault());
+}
+
+tapButton("jump", () => { input.jump = true; });
+tapButton("dashBtn", () => { input.dash = true; });
+tapButton("action", () => { openLetter(); });
+</script>
+</body>
+</html>
